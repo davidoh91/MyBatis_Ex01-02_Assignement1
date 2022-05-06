@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+    <!-- import dbInfo.properties -->
+    <properties resource="config/dbInfo.properties"/>
+
+    <settings>
+        <!-- a null value at #{empName} causes an error, so automatically insert NULL when null  -->
+        <!-- <setting name="jdbcTypeForNull" value="Null"/> -->
+
+        <!-- map sql's underscore and java's camel case -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <!-- set aliases for DTO classes -->
+    <typeAliases>
+        <typeAlias type="mvc.dto.ProductDTO" alias="productDTO"/>
+        <typeAlias type="mvc.dto.ProductSearchDTO" alias="productSearchDTO"/>
+
+    </typeAliases>
+
+    <!-- DB Connection Info -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED"> <!-- UNPOOLED, POOLED -->
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- register mappers  -->
+    <mappers>
+        <mapper resource="config/ProductMapper.xml"/>
+    </mappers>
+
+
+</configuration>

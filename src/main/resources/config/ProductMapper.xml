@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="productMapper">
+
+    <!-- use include to refer to frequently used SQL -->
+    <sql id="productSelectSql">
+        select * from productlist
+    </sql>
+
+    <!--  [1] insert a product   -->
+    <select id="insertProduct" parameterType="productDTO">
+        insert into productlist(code, name, qty, price, detail)
+        values(#{code}, #{name}, #{qty}, #{price}, #{detail})
+    </select>
+
+    <!--  [2] dynamic query - select all by dynamic conditions   -->
+    <!-- failed attempt ..
+    <select id="selectProduct" parameterType="productSearchDTO" resultType="productDTO">
+        <include refid="productSelectSql"/>
+        <where>
+            <if test="searchBy!=null">
+                ${searchBy} like concat('%',${searchKeyword},'%')
+            </if>
+        </where>
+
+        <if test="sortBy!=null">
+            order by ${sortBy} DESC
+        </if>
+    </select>
+    -->
+    <select id="selectProduct" parameterType="map" resultType="productDTO">
+        <include refid="productSelectSql"/>
+        <where>
+            <if test="searchBy!=null">
+                ${searchBy} like '%' || #{searchKeyword} || '%'
+            </if>
+        </where>
+
+        <if test="sortBy!=null">
+            order by ${sortBy} DESC
+        </if>
+    </select>
+
+
+    <!--  [3] update product  -->
+    <select id="updateProduct" parameterType="productDTO">
+        update productlist
+        <set>
+            <if test="code!=null">
+                code=#{code},
+            </if>
+            <if test="name!=null">
+                name=#{name},
+            </if>
+            <if test="qty!=null">
+                qty=#{qty},
+            </if>
+            <if test="price!=null">
+                price=#{price}
+            </if>
+
+            <where>
+                code=#{code}
+            </where>
+        </set>
+
+    </select>
+
+    <!--  [4] delete product  -->
+    <select id="deleteProduct" parameterType="string">
+        delete from productlist where code=#{code}
+    </select>
+
+    <!--  [5] total qty of all products  -->
+    <select id="getTotalProductCount" resultType="int">
+        select sum(qty) from productlist
+    </select>
+
+    <!--  [6] select products from param product codes   -->
+    <select id="selectByCodes" parameterType="list" resultType="productDTO">
+        <include refid="productSelectSql"/>
+        <where>
+            code in
+            <foreach collection="list" open="(" item="item" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+
+</mapper>
